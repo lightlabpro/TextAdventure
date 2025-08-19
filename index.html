@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Lifeline - Text Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f1419">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Space Lifeline">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Header with character info and controls -->
+        <header id="game-header">
+            <div class="status-bar">
+                <div class="character-info">
+                    <div class="character-avatar">🚀</div>
+                    <div class="character-details">
+                        <span id="character-name">Alex Chen</span>
+                        <span id="connection-status" class="status-online">● Signal Strong</span>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button id="rewind-btn" class="control-btn" title="Rewind to previous choice">
+                        <span class="btn-icon">↶</span>
+                        <span class="btn-text">Rewind</span>
+                    </button>
+                    <button id="fast-mode-btn" class="control-btn" title="Skip delays">
+                        <span class="btn-icon">⚡</span>
+                        <span class="btn-text">Fast</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main chat/message area -->
+        <main id="chat-area">
+            <div id="messages-container">
+                <div class="system-message">
+                    <div class="message-icon">📡</div>
+                    <div class="message-text">Establishing communication link...</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Choice buttons area -->
+        <section id="choices-area">
+            <div id="choices-container">
+                <!-- Choice buttons will be dynamically added here -->
+            </div>
+            <div id="typing-indicator" class="hidden">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="typing-text">Alex is typing...</span>
+            </div>
+        </section>
+
+        <!-- Game over screen -->
+        <div id="game-over-screen" class="hidden">
+            <div class="game-over-content">
+                <h2 id="game-over-title">Mission Complete</h2>
+                <p id="game-over-message">You've reached the end of this story branch.</p>
+                <div class="game-over-stats">
+                    <div class="stat">
+                        <span class="stat-label">Survival Time:</span>
+                        <span id="survival-time">0 hours</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Choices Made:</span>
+                        <span id="choices-made">0</span>
+                    </div>
+                </div>
+                <div class="game-over-actions">
+                    <button id="restart-btn" class="action-btn">Start Over</button>
+                    <button id="try-different-btn" class="action-btn">Try Different Choices</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="gameEngine.js"></script>
+    <script src="story.js"></script>
+    <script src="characters.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
+```
+
+```
+
