@@ -1,57 +1,38 @@
-# Space Lifeline - Text Adventure Game
+# Space Rescue - Text Adventure Game
 
-A Lifeline-style text adventure game where you guide a stranded astronaut to safety through real-time messaging.
+A Lifeline-style text adventure game where you play as a space rescue communications specialist helping stranded vessels in deep space.
 
 ## Features
 
-- **Real-time messaging system** with typing indicators and delays
-- **Multiple story branches** leading to different endings
-- **Rewind functionality** to try different choices
-- **Fast Mode** to skip delays after first playthrough
-- **Progressive Web App** that works offline and can be installed on mobile devices
-- **Save/Load functionality** to continue your progress
-- **Mobile-optimized interface** designed for iPhone Safari
+- Real-time messaging system with realistic delays
+- Multiple story branches and endings
+- Character development and relationship building
+- Professional space emergency scenarios
+- Rewind system to explore different choices
+- Fast mode for experienced players
+- Mobile-optimized interface
 
 ## How to Play
 
-1. Open `index.html` in your web browser
-2. Read Alex's messages as they come in
-3. Choose your responses by tapping/clicking the choice buttons
-4. Guide Alex to safety through your decisions
-5. Use Rewind to try different story paths
-6. Enable Fast Mode for quicker replays
+1. Open `index.html` in a web browser
+2. Click "Start Game" to begin
+3. Make choices to guide the stranded crew
+4. Use the rewind button to try different paths
+5. Enable fast mode to skip delays
 
-## Installation on iPhone
+## Installation
 
-1. Open the game in Safari
-2. Tap the Share button
-3. Scroll down and tap "Add to Home Screen"
-4. The game will now work like a native app!
-
-## Controls
-
-- **Rewind button** - Go back to your last choice
-- **Fast Mode** - Skip typing delays and waiting times
-- **Number keys 1-9** - Quick select choices (desktop)
-- **F key** - Toggle Fast Mode (desktop)
-- **R key** - Rewind (desktop)
-
-## Technical Details
-
-Built with:
-- Pure HTML5, CSS3, and JavaScript
-- Progressive Web App (PWA) technology
-- Local storage for save games
-- Service Worker for offline functionality
-- Mobile-first responsive design
-
-No external dependencies or frameworks required!
+Simply open `index.html` in any modern web browser. For the best experience on mobile devices, add the page to your home screen.
 
 ## Story
 
-You're in contact with Alex Chen, a scientist stranded on a damaged research vessel near Europa. The ship is failing and Alex needs your guidance to survive. Every choice matters - some lead to safety, others to disaster.
+You are Commander Sarah Chen, a senior communications specialist at the Interstellar Emergency Response Center. When the research vessel Meridian loses contact with Earth near Europa, you must establish communication and guide the crew to safety through a series of critical decisions.
 
-Multiple story branches ensure replayability, and the rewind system lets you explore different outcomes.
+## Technical Details
 
-Enjoy the adventure! 🚀
+- Pure HTML/CSS/JavaScript
+- Progressive Web App (PWA) support
+- Mobile-responsive design
+- Local storage for game progress
+- Service worker for offline functionality
 

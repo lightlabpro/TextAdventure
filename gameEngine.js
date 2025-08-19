@@ -1,17 +1,18 @@
 /**
  * Game Engine - Core functionality for Lifeline-style text adventure
- * Handles real-time messaging, choice management, save/load, and game flow
+ * CLEAN VERSION - No emojis, dramatic timing
  */
 
 class GameEngine {
     constructor() {
+        console.log('GameEngine constructor called');
         this.currentState = null;
         this.gameHistory = [];
         this.playerChoices = [];
         this.gameStartTime = null;
         this.fastMode = false;
         this.typingDelay = 50; // ms per character
-        this.messageDelay = 2000; // ms between messages
+        this.messageDelay = 3000; // ms between messages - longer for drama
         this.isTyping = false;
         this.gameStats = {
             choicesMade: 0,
@@ -20,10 +21,11 @@ class GameEngine {
         
         this.initializeElements();
         this.bindEvents();
-        this.loadGame();
+        console.log('GameEngine initialized successfully');
     }
 
     initializeElements() {
+        console.log('Initializing elements...');
         this.elements = {
             messagesContainer: document.getElementById('messages-container'),
             choicesContainer: document.getElementById('choices-container'),
@@ -40,41 +42,56 @@ class GameEngine {
             restartBtn: document.getElementById('restart-btn'),
             tryDifferentBtn: document.getElementById('try-different-btn')
         };
+        
+        // Check if all elements were found
+        for (let [key, element] of Object.entries(this.elements)) {
+            if (!element) {
+                console.error(`Element not found: ${key}`);
+            }
+        }
+        console.log('Elements initialized');
     }
 
     bindEvents() {
-        this.elements.rewindBtn.addEventListener('click', () => this.rewindToLastChoice());
-        this.elements.fastModeBtn.addEventListener('click', () => this.toggleFastMode());
-        this.elements.restartBtn.addEventListener('click', () => this.restartGame());
-        this.elements.tryDifferentBtn.addEventListener('click', () => this.rewindToLastChoice());
+        console.log('Binding events...');
+        if (this.elements.rewindBtn) {
+            this.elements.rewindBtn.addEventListener('click', () => this.rewindToLastChoice());
+        }
+        if (this.elements.fastModeBtn) {
+            this.elements.fastModeBtn.addEventListener('click', () => this.toggleFastMode());
+        }
+        if (this.elements.restartBtn) {
+            this.elements.restartBtn.addEventListener('click', () => this.restartGame());
+        }
+        if (this.elements.tryDifferentBtn) {
+            this.elements.tryDifferentBtn.addEventListener('click', () => this.rewindToLastChoice());
+        }
 
         // Auto-save on page unload
         window.addEventListener('beforeunload', () => this.saveGame());
-        
-        // Handle visibility change for realistic timing
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                this.pauseGame();
-            } else {
-                this.resumeGame();
-            }
-        });
+        console.log('Events bound');
     }
 
     async startGame() {
+        console.log('Starting game...');
         this.gameStartTime = Date.now();
         this.currentState = STORY_DATA.start;
         this.clearMessages();
         
-        // Show initial system message
-        await this.addSystemMessage("📡 Establishing communication link...", 1000);
-        await this.addSystemMessage("🔊 Signal acquired. Contact established.", 2000);
+        // Dramatic introduction sequence
+        await this.addSystemMessage("ESTABLISHING COMMUNICATION LINK...", 1000);
+        await this.delay(2000);
+        await this.addSystemMessage("SIGNAL ACQUIRED. CONTACT ESTABLISHED.", 1000);
+        await this.delay(1500);
+        await this.addSystemMessage("INCOMING TRANSMISSION FROM MERIDIAN...", 1000);
+        await this.delay(2000);
         
         // Start the story
         await this.processGameState();
     }
 
     async processGameState() {
+        console.log('Processing game state:', this.currentState?.id);
         if (!this.currentState) {
             console.error('No current state found');
             return;
@@ -87,13 +104,19 @@ class GameEngine {
             this.updateCharacterInfo(state.character);
         }
 
-        // Show character messages
+        // Show character messages with dramatic timing
         if (state.messages) {
             for (let i = 0; i < state.messages.length; i++) {
                 const message = state.messages[i];
                 await this.showTypingIndicator();
-                await this.addCharacterMessage(message);
+                
+                // Longer typing time for more dramatic effect
+                if (!this.fastMode) {
+                    await this.delay(2000 + (message.length * 50)); // More realistic typing time
+                }
+                
                 await this.hideTypingIndicator();
+                await this.addCharacterMessage(message);
                 
                 if (i < state.messages.length - 1) {
                     await this.delay(this.getMessageDelay());
@@ -103,11 +126,11 @@ class GameEngine {
 
         // Show choices or handle game end
         if (state.choices && state.choices.length > 0) {
-            await this.delay(500);
+            await this.delay(1000);
             this.showChoices(state.choices);
             this.enableRewind();
         } else if (state.gameOver) {
-            await this.delay(1000);
+            await this.delay(2000);
             this.showGameOver(state.gameOver);
         }
 
@@ -116,14 +139,20 @@ class GameEngine {
     }
 
     async addCharacterMessage(messageText) {
+        console.log('Adding character message:', messageText);
+        
+        // Create message element
         const messageElement = this.createMessageElement(messageText, 'character');
         this.elements.messagesContainer.appendChild(messageElement);
         this.scrollToBottom();
         
-        // Animate typing if not in fast mode
-        if (!this.fastMode) {
-            await this.animateTyping(messageElement.querySelector('.message-text'), messageText);
-        }
+        // Add a subtle fade-in effect
+        const messageTextElement = messageElement.querySelector('.message-text');
+        messageTextElement.style.opacity = '0';
+        messageTextElement.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            messageTextElement.style.opacity = '1';
+        }, 50);
     }
 
     async addPlayerMessage(messageText) {
@@ -140,7 +169,7 @@ class GameEngine {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'system-message fade-in';
         messageDiv.innerHTML = `
-            <div class="message-icon">📡</div>
+            <div class="message-icon">SYS</div>
             <div class="message-text">${messageText}</div>
         `;
         
@@ -152,7 +181,7 @@ class GameEngine {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message message-from-${sender} fade-in`;
         
-        const avatar = sender === 'character' ? '🚀' : '👤';
+        const avatar = sender === 'character' ? 'A' : 'U';
         const avatarClass = sender === 'character' ? 'character-avatar-msg' : 'player-avatar-msg';
         
         messageDiv.innerHTML = `
@@ -166,20 +195,8 @@ class GameEngine {
         return messageDiv;
     }
 
-    async animateTyping(element, text) {
-        if (this.fastMode) {
-            element.textContent = text;
-            return;
-        }
-
-        element.textContent = '';
-        for (let i = 0; i < text.length; i++) {
-            element.textContent += text[i];
-            await this.delay(this.typingDelay);
-        }
-    }
-
     showChoices(choices) {
+        console.log('Showing choices:', choices.length);
         this.elements.choicesContainer.innerHTML = '';
         
         choices.forEach((choice, index) => {
@@ -193,6 +210,7 @@ class GameEngine {
     }
 
     async makeChoice(choice, index) {
+        console.log('Making choice:', choice.text);
         // Record the choice
         this.gameStats.choicesMade++;
         this.playerChoices.push({
@@ -225,8 +243,8 @@ class GameEngine {
         switch (action.type) {
             case 'delay':
                 if (!this.fastMode) {
-                    await this.addSystemMessage(`⏳ ${action.message || 'Processing...'}`);
-                    await this.delay(action.duration || 3000);
+                    await this.addSystemMessage(`${action.message || 'PROCESSING...'}`);
+                    await this.delay(action.duration || 4000);
                 }
                 break;
                 
@@ -245,6 +263,14 @@ class GameEngine {
         
         this.isTyping = true;
         this.elements.typingIndicator.classList.remove('hidden');
+        
+        // Update typing text to show character name
+        const typingText = this.elements.typingIndicator.querySelector('.typing-text');
+        if (typingText) {
+            const characterName = this.elements.characterName?.textContent || 'CONTACT';
+            typingText.textContent = `${characterName} IS TRANSMITTING...`;
+        }
+        
         this.scrollToBottom();
     }
 
@@ -254,7 +280,7 @@ class GameEngine {
     }
 
     updateCharacterInfo(character) {
-        if (character.name) {
+        if (character.name && this.elements.characterName) {
             this.elements.characterName.textContent = character.name;
         }
         if (character.status) {
@@ -264,12 +290,14 @@ class GameEngine {
 
     updateConnectionStatus(status) {
         const statusElement = this.elements.connectionStatus;
+        if (!statusElement) return;
+        
         statusElement.className = `status-${status}`;
         
         const statusTexts = {
-            online: '● Signal Strong',
-            weak: '● Signal Weak',
-            offline: '● Signal Lost'
+            online: 'SIGNAL STRONG',
+            weak: 'SIGNAL WEAK',
+            offline: 'SIGNAL LOST'
         };
         
         statusElement.textContent = statusTexts[status] || statusTexts.online;
@@ -278,10 +306,18 @@ class GameEngine {
     showGameOver(gameOverData) {
         this.updateGameStats();
         
-        this.elements.gameOverTitle.textContent = gameOverData.title || 'Mission Complete';
-        this.elements.gameOverMessage.textContent = gameOverData.message || 'You\'ve reached the end of this story branch.';
-        this.elements.survivalTime.textContent = this.formatSurvivalTime();
-        this.elements.choicesMade.textContent = this.gameStats.choicesMade.toString();
+        if (this.elements.gameOverTitle) {
+            this.elements.gameOverTitle.textContent = gameOverData.title || 'MISSION COMPLETE';
+        }
+        if (this.elements.gameOverMessage) {
+            this.elements.gameOverMessage.textContent = gameOverData.message || 'Communication terminated.';
+        }
+        if (this.elements.survivalTime) {
+            this.elements.survivalTime.textContent = this.formatSurvivalTime();
+        }
+        if (this.elements.choicesMade) {
+            this.elements.choicesMade.textContent = this.gameStats.choicesMade.toString();
+        }
         
         this.elements.gameOverScreen.classList.remove('hidden');
         this.elements.gameOverScreen.classList.add('fade-in');
@@ -318,8 +354,6 @@ class GameEngine {
     rewindMessages(timestamp) {
         const messages = this.elements.messagesContainer.children;
         for (let i = messages.length - 1; i >= 0; i--) {
-            // This is a simplified approach - in a real implementation,
-            // you'd want to track message timestamps more precisely
             if (messages[i].classList.contains('message-from-player')) {
                 messages[i].remove();
                 break;
@@ -328,11 +362,15 @@ class GameEngine {
     }
 
     enableRewind() {
-        this.elements.rewindBtn.disabled = false;
+        if (this.elements.rewindBtn) {
+            this.elements.rewindBtn.disabled = false;
+        }
     }
 
     disableRewind() {
-        this.elements.rewindBtn.disabled = true;
+        if (this.elements.rewindBtn) {
+            this.elements.rewindBtn.disabled = true;
+        }
     }
 
     restartGame() {
@@ -356,7 +394,7 @@ class GameEngine {
     }
 
     getMessageDelay() {
-        return this.fastMode ? 100 : this.messageDelay;
+        return this.fastMode ? 200 : this.messageDelay;
     }
 
     updateGameStats() {
@@ -373,23 +411,19 @@ class GameEngine {
 
     scrollToBottom() {
         const chatArea = document.getElementById('chat-area');
-        chatArea.scrollTop = chatArea.scrollHeight;
+        if (chatArea) {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
     }
 
     clearMessages() {
-        this.elements.messagesContainer.innerHTML = '';
+        if (this.elements.messagesContainer) {
+            this.elements.messagesContainer.innerHTML = '';
+        }
     }
 
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    pauseGame() {
-        // Handle game pause when tab becomes hidden
-    }
-
-    resumeGame() {
-        // Handle game resume when tab becomes visible
     }
 
     // Save/Load functionality
@@ -406,33 +440,7 @@ class GameEngine {
     }
 
     loadGame() {
-        const saved = localStorage.getItem('textAdventureGame');
-        if (saved) {
-            try {
-                const gameState = JSON.parse(saved);
-                
-                // Only load if there's meaningful progress
-                if (gameState.playerChoices && gameState.playerChoices.length > 0) {
-                    this.playerChoices = gameState.playerChoices;
-                    this.gameStats = gameState.gameStats || { choicesMade: 0, survivalTime: 0 };
-                    this.gameStartTime = gameState.gameStartTime;
-                    this.fastMode = gameState.fastMode || false;
-                    
-                    if (gameState.currentState) {
-                        this.currentState = this.getStateById(gameState.currentState);
-                        this.elements.fastModeBtn.classList.toggle('active', this.fastMode);
-                        this.processGameState();
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.warn('Failed to load saved game:', e);
-            }
-        }
-        
-        // Start new game if no valid save found
+        // For now, always start fresh to maintain dramatic intro
         this.startGame();
     }
 }
-```
-

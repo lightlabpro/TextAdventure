@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Game</title>
+    <style>
+        body { background: #000; color: white; font-family: Arial; }
+        .message { margin: 10px; padding: 10px; background: #333; }
+        .choice { margin: 5px; padding: 10px; background: #555; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="messages"></div>
+    <div id="choices"></div>
+    
+    <script>
+        const messages = [
+            "Hey, can you hear me? This is Alex Chen from the research vessel Meridian.",
+            "I need your help... something's gone terribly wrong up here.",
+            "Our ship was investigating an anomalous signal near Europa when we hit something."
+        ];
+        
+        const choices = [
+            "What's your current status?",
+            "You need to get to the escape pods immediately!",
+            "Tell me about the ship's systems."
+        ];
+        
+        let messageIndex = 0;
+        let choiceIndex = 0;
+        
+        function addMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.textContent = text;
+            document.getElementById('messages').appendChild(div);
+        }
+        
+        function addChoice(text) {
+            const div = document.createElement('div');
+            div.className = 'choice';
+            div.textContent = text;
+            div.onclick = () => {
+                addMessage('You: ' + text);
+                document.getElementById('choices').innerHTML = '';
+                nextMessage();
+            };
+            document.getElementById('choices').appendChild(div);
+        }
+        
+        function nextMessage() {
+            if (messageIndex < messages.length) {
+                setTimeout(() => {
+                    addMessage('Alex: ' + messages[messageIndex]);
+                    messageIndex++;
+                    if (messageIndex === messages.length) {
+                        setTimeout(() => {
+                            choices.forEach(choice => addChoice(choice));
+                        }, 1000);
+                    } else {
+                        nextMessage();
+                    }
+                }, 2000);
+            }
+        }
+        
+        // Start the game
+        nextMessage();
+    </script>
+</body>
+</html>
