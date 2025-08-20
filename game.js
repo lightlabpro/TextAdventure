@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
         addMobileOptimizations();
         console.log('Mobile optimizations added');
         
+        // Register Service Worker (optional)
+        registerServiceWorker();
+        
         // Start the cinematic intro sequence immediately
         startCinematicIntro();
         
@@ -39,7 +42,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Cinematic intro sequence - FIXED VERSION
+// Simple fallback game start function
+function startSimpleGame() {
+    console.log('Starting simple fallback game...');
+    
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.innerHTML = `
+            <div class="system-message fade-in">
+                <div class="message-text">ESTABLISHING COMMUNICATION LINK...</div>
+            </div>
+        `;
+        
+        // Add a simple message after a delay
+        setTimeout(() => {
+            messagesContainer.innerHTML += `
+                <div class="character-message fade-in">
+                    <div class="message-header">
+                        <span class="character-name">Alex Chen</span>
+                        <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="message-text">Hey, can you hear me? This is Alex Chen from the research vessel Meridian. I need your help... something's gone terribly wrong up here.</div>
+                </div>
+            `;
+            
+            // Add choice buttons
+            const choicesContainer = document.getElementById('choices-container');
+            if (choicesContainer) {
+                choicesContainer.innerHTML = `
+                    <button class="choice-btn" onclick="handleChoice('status')">What's your current status?</button>
+                    <button class="choice-btn" onclick="handleChoice('escape')">Get to the escape pods immediately!</button>
+                    <button class="choice-btn" onclick="handleChoice('systems')">Tell me about the ship's systems</button>
+                `;
+            }
+        }, 3000);
+    }
+}
+
+// Simple choice handler
+function handleChoice(choice) {
+    console.log('Choice made:', choice);
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.innerHTML += `
+            <div class="player-message fade-in">
+                <div class="message-text">Choice: ${choice}</div>
+            </div>
+        `;
+    }
+}
+
+// Cinematic intro sequence - TYPING ANIMATION VERSION
 async function startCinematicIntro() {
     const introScreen = document.getElementById('intro-screen');
     const introContent = document.getElementById('intro-content');
@@ -55,72 +108,168 @@ async function startCinematicIntro() {
     // Clear any existing content
     introContent.innerHTML = '';
     
-    const introTexts = [
-        { text: "SPACE RESCUE", type: "title", delay: 1200 },
-        { text: "A TEXT ADVENTURE", type: "subtitle", delay: 1000 },
-        { text: "YEAR 2157", type: "year", delay: 1000 },
-        { text: "Deep space exploration vessel MERIDIAN", type: "location", delay: 1200 },
-        { text: "has lost contact with Earth", type: "location", delay: 1000 },
-        { text: "You are the last hope", type: "dramatic", delay: 1000 },
-        { text: "for the crew's survival", type: "dramatic", delay: 1000 },
-        { text: "Establishing emergency communication link...", type: "system", delay: 1200 },
-        { text: "TAP TO BEGIN", type: "start", delay: 800 }
+    // Add control buttons
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = 'intro-controls';
+    controlsDiv.innerHTML = `
+        <button class="intro-btn" id="next-btn" style="display: none;">NEXT</button>
+        <button class="intro-btn" id="skip-intro-btn">SKIP INTRO</button>
+    `;
+    introScreen.appendChild(controlsDiv);
+    
+    const nextBtn = document.getElementById('next-btn');
+    const skipBtn = document.getElementById('skip-intro-btn');
+    
+    const introSequence = [
+        { text: "SPACE RESCUE", type: "title", duration: 5000 },
+        { text: "A TEXT ADVENTURE", type: "subtitle", duration: 3000 },
+        { text: "YEAR 2157", type: "year", duration: 3000 },
+        { text: "INTERSTELLAR EMERGENCY RESPONSE CENTER", type: "location", duration: 3000 },
+        { text: "LUNA COMMAND HUB", type: "location", duration: 3000 },
+        { text: "YOU ARE COMMANDER SARAH CHEN", type: "character", duration: 3000 },
+        { text: "SENIOR COMMUNICATIONS SPECIALIST", type: "character", duration: 3000 },
+        { text: "SUCCESSFULLY GUIDED 47 VESSELS", type: "stats", duration: 3000 },
+        { text: "SURVIVAL RATE: 94%", type: "stats", duration: 3000 },
+        { text: "EMERGENCY ALERT", type: "alert", duration: 3000 },
+        { text: "14:32 UTC - RESEARCH VESSEL MERIDIAN", type: "mission", duration: 3000 },
+        { text: "REPORTS ANOMALOUS READINGS NEAR EUROPA", type: "mission", duration: 3000 },
+        { text: "COMMANDED BY CAPTAIN ELENA RODRIGUEZ", type: "mission", duration: 3000 },
+        { text: "CONTACT LOST DURING INVESTIGATION", type: "mission", duration: 3000 },
+        { text: "DISTRESS SIGNAL INDICATES:", type: "status", duration: 3000 },
+        { text: "HULL BREACH IN MULTIPLE COMPARTMENTS", type: "status", duration: 3000 },
+        { text: "LIFE SUPPORT SYSTEMS COMPROMISED", type: "status", duration: 3000 },
+        { text: "CRITICAL DAMAGE TO PROPULSION", type: "status", duration: 3000 },
+        { text: "UNKNOWN NUMBER OF CASUALTIES", type: "status", duration: 3000 },
+        { text: "YOUR MISSION", type: "mission", duration: 3000 },
+        { text: "ESTABLISH COMMUNICATION WITH SURVIVORS", type: "mission", duration: 3000 },
+        { text: "ASSESS THE SITUATION", type: "mission", duration: 3000 },
+        { text: "PROVIDE GUIDANCE", type: "mission", duration: 3000 },
+        { text: "COORDINATE RESCUE EFFORTS", type: "mission", duration: 3000 },
+        { text: "EVERY DECISION MATTERS", type: "dramatic", duration: 3000 },
+        { text: "IN SPACE, THERE ARE NO SECOND CHANCES", type: "dramatic", duration: 3000 },
+        { text: "ESTABLISHING COMMUNICATION LINK...", type: "system", duration: 3000 }
     ];
     
-    // Display each line with cinematic timing
-    for (let i = 0; i < introTexts.length; i++) {
-        const item = introTexts[i];
+    let currentIndex = 0;
+    let skipIntro = false;
+    
+    // Skip intro button handler
+    skipBtn.addEventListener('click', () => {
+        skipIntro = true;
+        startGameAfterIntro();
+    });
+    
+    // Next button handler
+    nextBtn.addEventListener('click', () => {
+        currentIndex++;
+        if (currentIndex < introSequence.length) {
+            displayNextLine();
+        } else {
+            startGameAfterIntro();
+        }
+    });
+    
+    // Function to display next line with typing animation
+    async function displayNextLine() {
+        if (skipIntro) return;
         
-        // COMPLETELY clear previous content
+        const item = introSequence[currentIndex];
+        
+        // Clear previous content
         introContent.innerHTML = '';
         
-        // Create and display the text element
+        // Create text element
         const textElement = document.createElement('div');
-        textElement.className = `intro-${item.type}`;
-        textElement.textContent = item.text;
-        
-        // Force absolute positioning in center
-        textElement.style.position = 'absolute';
-        textElement.style.top = '50%';
-        textElement.style.left = '50%';
-        textElement.style.transform = 'translate(-50%, -50%)';
-        textElement.style.margin = '0';
-        textElement.style.padding = '0';
-        textElement.style.width = 'auto';
-        textElement.style.height = 'auto';
-        
+        textElement.className = `intro-text ${item.type === 'title' ? 'intro-title' : ''}`;
         introContent.appendChild(textElement);
         
-        // Special animation for title (but start immediately)
-        if (item.type === 'title') {
-            textElement.style.opacity = '1';
-            textElement.style.transform = 'translate(-50%, -50%) scale(1)';
-            textElement.style.transition = 'all 0.8s ease';
+        // Type out the text character by character
+        const text = item.text;
+        let currentText = '';
+        
+        for (let i = 0; i < text.length; i++) {
+            if (skipIntro) return;
             
-            // Start with scale animation
-            setTimeout(() => {
-                textElement.style.transform = 'translate(-50%, -50%) scale(1.1)';
-                setTimeout(() => {
-                    textElement.style.transform = 'translate(-50%, -50%) scale(1)';
-                }, 200);
-            }, 100);
+            currentText += text[i];
+            textElement.textContent = currentText + '█'; // Add cursor
+            
+            // Organic timing: faster for short text, slower for long text
+            const baseDelay = 50; // Base delay per character
+            const lengthMultiplier = Math.max(0.5, Math.min(2, text.length / 30)); // Adjust based on text length
+            const delay = baseDelay * lengthMultiplier;
+            
+            await new Promise(resolve => setTimeout(resolve, delay));
         }
         
-        // If this is the start prompt, make it clickable
-        if (item.type === 'start') {
-            textElement.style.cursor = 'pointer';
-            textElement.onclick = () => {
-                introScreen.style.display = 'none';
-                if (gameEngine) {
-                    gameEngine.startGame();
+        // Remove cursor and add blinking cursor
+        textElement.textContent = currentText;
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor';
+        textElement.appendChild(cursor);
+        
+        // Calculate organic display time based on text length
+        const baseTime = 2000; // Base time in ms
+        const lengthMultiplier = Math.max(0.8, Math.min(3, text.length / 20)); // Adjust based on text length
+        const displayTime = baseTime * lengthMultiplier;
+        
+        // Show next button after a short delay
+        setTimeout(() => {
+            if (!skipIntro) {
+                nextBtn.style.display = 'inline-block';
+            }
+        }, 1000);
+        
+        // Auto-advance after organic time (unless skipped)
+        setTimeout(() => {
+            if (!skipIntro) {
+                currentIndex++;
+                if (currentIndex < introSequence.length) {
+                    nextBtn.style.display = 'none';
+                    displayNextLine();
+                } else {
+                    startGameAfterIntro();
                 }
-            };
+            }
+        }, displayTime);
+    }
+    
+    // Start the sequence
+    displayNextLine();
+}
+
+// Function to start game after intro
+function startGameAfterIntro() {
+    console.log('Intro sequence complete, starting game...');
+    console.log('Game engine exists:', !!gameEngine);
+    
+    // Hide intro screen
+    const introScreen = document.getElementById('intro-screen');
+    if (introScreen) {
+        introScreen.style.display = 'none';
+    }
+    
+    // Show game container
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+        gameContainer.style.display = 'block';
+        console.log('Game container shown');
+    }
+    
+    // Try to start the game
+    if (gameEngine && typeof gameEngine.startGame === 'function') {
+        console.log('Calling gameEngine.startGame()');
+        try {
+            gameEngine.startGame();
+            console.log('Game started successfully');
+        } catch (error) {
+            console.error('Error starting game:', error);
+            console.log('Falling back to simple game...');
+            startSimpleGame();
         }
-        
-        // Wait before next line (but not for the first line)
-        if (i < introTexts.length - 1) {
-            await delay(item.delay);
-        }
+    } else {
+        console.error('Game engine not available or startGame method missing');
+        console.log('Falling back to simple game...');
+        startSimpleGame();
     }
 }
 
@@ -152,17 +301,24 @@ function addMobileOptimizations() {
     });
 }
 
-// Service Worker registration for PWA functionality
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then((registration) => {
-                console.log('SW registered: ', registration);
-            })
-            .catch((registrationError) => {
-                console.log('SW registration failed: ', registrationError);
-            });
-    });
+// Service Worker Registration - Optional for local development
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        // Only register if we're on a proper server (not file:// protocol)
+        if (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered successfully:', registration);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed (this is normal for local development):', error);
+                });
+        } else {
+            console.log('Service Worker not registered - running from local file (this is normal)');
+        }
+    } else {
+        console.log('Service Worker not supported in this browser');
+    }
 }
 
 // Keyboard shortcuts for desktop testing
