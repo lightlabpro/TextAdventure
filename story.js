@@ -11,10 +11,10 @@ const STORY_DATA = {
             status: 'online'
         },
         messages: [
-            "Hey, can you hear me? This is Alex Chen from the research vessel Meridian.",
-            "I need your help... something's gone terribly wrong up here.",
             "Our ship was investigating an anomalous signal near Europa when we hit something. The hull is breached and we're losing life support.",
-            "The captain and most of the crew... they didn't make it. I'm alone in the emergency pod bay."
+            "The captain and most of the crew... they didn't make it. I'm alone in the emergency pod bay.",
+            "I can see the damage on my monitors. Life support is at 78%, power systems are down to 42%. I'm trying to stay calm but...",
+            "The emergency lighting is flickering and I can smell something burning... probably the electrical systems."
         ],
         choices: [
             {
@@ -31,6 +31,35 @@ const STORY_DATA = {
                 text: "Tell me about the ship's systems. What's still working?",
                 type: "technical",
                 next: "systems_check"
+            }
+        ]
+    },
+
+    establish_contact: {
+        id: 'establish_contact',
+        messages: [
+            "Thank you for responding. I'm Alex Chen, xenobiologist aboard the Meridian.",
+            "We were investigating an anomalous energy signature near Europa when we hit something. The impact was massive.",
+            "The hull is breached in multiple compartments. Life support is failing, and I can see fires in the engineering section.",
+            "Captain Rodriguez and most of the crew... they didn't make it. I'm alone in the emergency pod bay.",
+            "I need to get to the escape pods, but the corridor is blocked by debris. I can hear the ship groaning around me.",
+            "I'm going to start transmitting my vital signs and ship data to you. The systems are damaged but I can still send basic telemetry."
+        ],
+        choices: [
+            {
+                text: "Can you access the ship's diagnostic systems? We need to assess the damage.",
+                type: "technical",
+                next: "diagnostic_check"
+            },
+            {
+                text: "Focus on getting to the escape pods. Time is critical.",
+                type: "urgent",
+                next: "escape_priority"
+            },
+            {
+                text: "Stay calm, Alex. Let's work through this step by step.",
+                type: "supportive",
+                next: "calm_approach"
             }
         ]
     },
@@ -61,13 +90,73 @@ const STORY_DATA = {
         ]
     },
 
-    rush_to_pods: {
-        id: 'rush_to_pods',
+    diagnostic_check: {
+        id: 'diagnostic_check',
         messages: [
-            "You're right! I'm heading to the pod bay now.",
-            "Wait... the corridor is blocked by debris from the impact.",
+            "I can access the main computer from here. Let me check the systems...",
+            "Life support is at 78% and dropping. Oxygen levels are critical.",
+            "Power systems are at 42% and failing. The backup generators are damaged.",
+            "Structural integrity is at 23%. The ship is breaking apart.",
+            "I can see the escape pods are still functional, but the route is blocked."
+        ],
+        choices: [
+            {
+                text: "Can you reroute power to life support? Buy us more time.",
+                type: "technical",
+                next: "power_reroute"
+            },
+            {
+                text: "Forget the diagnostics. Focus on finding a way to the pods.",
+                type: "urgent",
+                next: "find_route"
+            },
+            {
+                text: "How long do we have before life support fails completely?",
+                type: "safe",
+                next: "time_assessment"
+            }
+        ]
+    },
+
+    power_reroute: {
+        id: 'power_reroute',
+        messages: [
+            "I can try to reroute power from non-essential systems to life support.",
+            "The computer is responding... I'm diverting power from the research labs.",
+            "Life support is now at 85% and stabilizing. That should buy us some time.",
+            "But the power systems are still failing. We're down to 38% now."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 85,
+            powerLevel: 38,
+            stressLevel: 40
+        },
+        choices: [
+            {
+                text: "Good work. Now let's focus on getting you to the escape pods.",
+                type: "supportive",
+                next: "find_route"
+            },
+            {
+                text: "Can you access the ship's schematics? Find an alternate route.",
+                type: "technical",
+                next: "schematic_check"
+            },
+            {
+                text: "The power reroute worked. Let's try to stabilize the ship.",
+                type: "safe",
+                next: "stabilize_ship"
+            }
+        ]
+    },
+
+    find_route: {
+        id: 'find_route',
+        messages: [
+            "I need to find a way to the escape pods. The main corridor is blocked.",
             "I can see sparks coming from the damaged section. It looks dangerous but I might be able to squeeze through.",
-            "Or I could take the maintenance shaft, but that would take longer..."
+            "Or I could take the maintenance shaft, but that would take longer...",
+            "There's also a service corridor on the port side, but I'm not sure if it's accessible."
         ],
         choices: [
             {
@@ -86,93 +175,9 @@ const STORY_DATA = {
                 next: "debris_shortcut"
             },
             {
-                text: "Wait, look for another way. There might be a service corridor.",
+                text: "Check the service corridor first. It might be safer.",
                 type: "technical",
-                next: "find_alternate_route"
-            }
-        ]
-    },
-
-    systems_check: {
-        id: 'systems_check',
-        character: {
-            status: 'weak'
-        },
-        messages: [
-            "Let me check... The main computers are down, but emergency systems are running on battery backup.",
-            "Life support shows... 18 minutes of oxygen remaining in this section.",
-            "The escape pods should have independent power sources, but I need to get to the bay to check their status.",
-            "Wait, the communication array is damaged. That's why the signal is getting weaker."
-        ],
-        choices: [
-            {
-                text: "18 minutes is enough. Move carefully to the pod bay.",
-                type: "safe",
-                next: "careful_approach"
-            },
-            {
-                text: "Try to boost the signal first so we don't lose contact.",
-                type: "technical",
-                next: "boost_signal"
-            },
-            {
-                text: "Forget the signal. Run to the pods now!",
-                type: "urgent",
-                next: "oxygen_race"
-            }
-        ]
-    },
-
-    pod_status_check: {
-        id: 'pod_status_check',
-        messages: [
-            "Good thinking. Let me access the pod bay status from here...",
-            "I'm reading the emergency panel... Pod 1 shows a malfunction. Pod 2 appears operational.",
-            "Pod 3... the status is unclear. Could be damaged or just a sensor issue.",
-            "The bay door control is showing amber - might be manual override only."
-        ],
-        choices: [
-            {
-                text: "Head straight to Pod 2 since you know it's working.",
-                type: "safe",
-                next: "pod_2_direct"
-            },
-            {
-                text: "Check Pod 3 first - might be your best option if it's actually working.",
-                type: "technical",
-                next: "investigate_pod_3"
-            },
-            {
-                text: "Try to fix Pod 1's malfunction. More options are better.",
-                type: "technical",
-                next: "repair_pod_1"
-            }
-        ]
-    },
-
-    grab_supplies: {
-        id: 'grab_supplies',
-        messages: [
-            "Smart thinking. There's an emergency supply locker right here.",
-            "Got it... emergency rations, water, medical kit, and a portable oxygen tank.",
-            "There's also a multi-tool and what looks like a backup communication device.",
-            "This extra oxygen could be crucial. Now, which way to the pods?"
-        ],
-        choices: [
-            {
-                text: "Test the backup communicator first.",
-                type: "technical",
-                next: "test_backup_comm"
-            },
-            {
-                text: "Head to the pod bay using the main corridor.",
-                type: "safe",
-                next: "main_corridor_approach"
-            },
-            {
-                text: "Use the utility tunnels to avoid damaged areas.",
-                type: "technical",
-                next: "utility_tunnels"
+                next: "service_corridor"
             }
         ]
     },
@@ -180,289 +185,597 @@ const STORY_DATA = {
     maintenance_shaft: {
         id: 'maintenance_shaft',
         messages: [
-            "I'm in the shaft... it's cramped but seems stable.",
-            "I can hear the hull creaking above me. This is definitely the safer route.",
-            "Almost there... I can see the pod bay access hatch ahead.",
-            "Made it! I'm in the pod bay now. Let me check the pods..."
+            "I'm taking the maintenance shaft. It's tight but should be safer.",
+            "I can hear the ship's systems failing around me. The power is fluctuating.",
+            "I'm almost through... wait, there's a blockage ahead.",
+            "I can see light through a small gap. I think I can squeeze through."
         ],
+        telemetry_effect: {
+            oxygenLevel: 82,
+            powerLevel: 35,
+            stressLevel: 45
+        },
         choices: [
             {
-                text: "Great! What's the status of the escape pods?",
+                text: "Take your time. Don't get stuck.",
                 type: "safe",
-                next: "pod_bay_arrival_safe"
+                next: "shaft_escape"
+            },
+            {
+                text: "Hurry up! The ship is falling apart!",
+                type: "urgent",
+                next: "shaft_escape"
+            },
+            {
+                text: "Can you see what's blocking the way?",
+                type: "technical",
+                next: "shaft_escape"
             }
         ]
     },
+
+    shaft_escape: {
+        id: 'shaft_escape',
+        messages: [
+            "I made it through! I'm in the main corridor now.",
+            "The escape pods are just ahead. I can see them.",
+            "But there's smoke coming from the engineering section. The fires are spreading.",
+            "I need to get to the pods quickly. The ship is breaking apart."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 75,
+            powerLevel: 30,
+            stressLevel: 50
+        },
+        choices: [
+            {
+                text: "Get to the pods now! Don't stop for anything!",
+                type: "urgent",
+                next: "reach_pods"
+            },
+            {
+                text: "Check the pod systems before boarding.",
+                type: "technical",
+                next: "pod_check"
+            },
+            {
+                text: "Stay calm. You're almost there.",
+                type: "supportive",
+                next: "reach_pods"
+            }
+        ]
+    },
+
+    reach_pods: {
+        id: 'reach_pods',
+        messages: [
+            "I'm at the escape pods! I can see three pods available.",
+            "Pod 1 shows green status. Pod 2 has a warning light. Pod 3 is offline.",
+            "I'm going to board Pod 1. It looks the most reliable.",
+            "The ship is shaking violently now. I need to launch immediately."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 70,
+            powerLevel: 25,
+            stressLevel: 55
+        },
+        choices: [
+            {
+                text: "Launch immediately! The ship is failing!",
+                type: "urgent",
+                next: "launch_escape"
+            },
+            {
+                text: "Check the pod's systems first. Make sure it's ready.",
+                type: "technical",
+                next: "pod_systems_check"
+            },
+            {
+                text: "Take a moment to breathe. You're safe now.",
+                type: "supportive",
+                next: "launch_escape"
+            }
+        ]
+    },
+
+    launch_escape: {
+        id: 'launch_escape',
+        messages: [
+            "I'm launching the escape pod!",
+            "The pod is separating from the ship. I can see the Meridian breaking apart.",
+            "The pod's systems are all green. Life support is stable.",
+            "I'm safe. The pod is on course for the nearest rescue beacon.",
+            "Thank you for helping me through this. I wouldn't have made it without your guidance."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 100,
+            powerLevel: 100,
+            stressLevel: 30
+        },
+        ending: {
+            type: "success",
+            title: "Mission Accomplished",
+            message: "Alex Chen successfully escaped the doomed Meridian. Your guidance helped save a life.",
+            stats: {
+                survivalTime: "15 minutes",
+                choicesMade: "8",
+                trustLevel: "High",
+                ending: "Escape Success"
+            }
+        }
+    },
+
+    // ALTERNATE BRANCHES AND ENDINGS
 
     debris_shortcut: {
         id: 'debris_shortcut',
-        character: {
-            status: 'weak'
-        },
         messages: [
-            "I'm pushing through... OW! A sharp piece of metal caught my leg!",
-            "I'm bleeding but I'm through. The pod bay is just ahead.",
-            "The sparks are getting worse behind me. That section might collapse soon.",
-            "But I made it here faster... that has to count for something."
+            "I'm pushing through the debris. It's dangerous but faster.",
+            "I can feel the heat from the electrical fires. The air is thick with smoke.",
+            "I'm almost through... wait, something's wrong.",
+            "I'm stuck! The debris shifted and I'm trapped!"
         ],
+        telemetry_effect: {
+            oxygenLevel: 65,
+            powerLevel: 20,
+            stressLevel: 70
+        },
         choices: [
             {
-                text: "Apply pressure to the wound first, then check the pods.",
+                text: "Stay calm! Try to free yourself!",
+                type: "supportive",
+                next: "trapped_escape"
+            },
+            {
+                text: "Can you reach any tools? Try to pry yourself free.",
+                type: "technical",
+                next: "trapped_escape"
+            },
+            {
+                text: "We need to find another way. Can you go back?",
                 type: "safe",
-                next: "treat_injury_then_pods"
-            },
-            {
-                text: "Ignore the injury for now. Check the escape pods immediately.",
-                type: "urgent",
-                next: "pods_despite_injury"
+                next: "find_route"
             }
         ]
     },
 
-    pod_bay_arrival_safe: {
-        id: 'pod_bay_arrival_safe',
+    trapped_escape: {
+        id: 'trapped_escape',
         messages: [
-            "Pod 1 has a red warning light - looks like the launch system is damaged.",
-            "Pod 2's systems are all green. Engines, life support, navigation - all operational.",
-            "Pod 3... the status panel is dark. Could be a power issue or complete failure.",
-            "The bay door mechanism looks intact, but I'll need to manually unlock it."
+            "I'm trying to free myself... the debris is heavy.",
+            "I can see the escape pods from here, but I can't reach them.",
+            "The ship is shaking more violently. I think it's going to break apart.",
+            "I'm not going to make it... I'm sorry."
         ],
+        telemetry_effect: {
+            oxygenLevel: 45,
+            powerLevel: 15,
+            stressLevel: 85
+        },
+        ending: {
+            type: "failure",
+            title: "Mission Failed",
+            message: "Alex Chen became trapped in the debris and could not reach the escape pods. The Meridian was lost with all hands.",
+            stats: {
+                survivalTime: "12 minutes",
+                choicesMade: "6",
+                trustLevel: "Low",
+                ending: "Trapped in Debris"
+            }
+        }
+    },
+
+    stabilize_ship: {
+        id: 'stabilize_ship',
+        messages: [
+            "I'm trying to stabilize the ship's systems. Maybe I can buy more time.",
+            "I'm rerouting power from all non-essential systems to structural integrity.",
+            "The ship is responding... the shaking is lessening.",
+            "But the damage is too extensive. The ship is still failing."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 60,
+            powerLevel: 25,
+            stressLevel: 60
+        },
         choices: [
             {
-                text: "Go with Pod 2. It's your best bet for survival.",
+                text: "The ship is doomed. Get to the escape pods now!",
+                type: "urgent",
+                next: "find_route"
+            },
+            {
+                text: "Can you access the emergency protocols?",
+                type: "technical",
+                next: "emergency_protocols"
+            },
+            {
+                text: "You've done what you can. It's time to save yourself.",
+                type: "supportive",
+                next: "find_route"
+            }
+        ]
+    },
+
+    emergency_protocols: {
+        id: 'emergency_protocols',
+        messages: [
+            "I'm accessing the emergency protocols...",
+            "There's an emergency beacon system. I can activate it.",
+            "The beacon will signal for help, but it will drain the remaining power.",
+            "I'm activating the emergency beacon. At least someone will know what happened here."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 55,
+            powerLevel: 15,
+            stressLevel: 65
+        },
+        choices: [
+            {
+                text: "Good thinking. Now get to the escape pods!",
+                type: "supportive",
+                next: "find_route"
+            },
+            {
+                text: "The beacon will help future rescue missions. Launch it.",
+                type: "technical",
+                next: "beacon_launch"
+            },
+            {
+                text: "Forget the beacon. Save yourself first!",
+                type: "urgent",
+                next: "find_route"
+            }
+        ]
+    },
+
+    beacon_launch: {
+        id: 'beacon_launch',
+        messages: [
+            "I'm launching the emergency beacon. It's transmitting our location and data.",
+            "The beacon is away. Future crews will know what happened here.",
+            "Now I need to get to the escape pods. The power is almost gone.",
+            "I can barely see in the emergency lighting. The ship is dying."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 50,
+            powerLevel: 10,
+            stressLevel: 70
+        },
+        ending: {
+            type: "partial_success",
+            title: "Beacon Launched",
+            message: "Alex Chen launched the emergency beacon before the ship was lost. Future rescue missions will have critical data about the incident.",
+            stats: {
+                survivalTime: "18 minutes",
+                choicesMade: "10",
+                trustLevel: "Medium",
+                ending: "Beacon Success, Personal Loss"
+            }
+        }
+    },
+
+    // CRITICAL TELEMETRY-BASED SCENARIOS
+
+    time_assessment: {
+        id: 'time_assessment',
+        messages: [
+            "Let me calculate the remaining time...",
+            "At current oxygen consumption rates, I have about 15 minutes before life support fails completely.",
+            "But the structural integrity is failing faster. The ship could break apart in 8-10 minutes.",
+            "I need to reach the escape pods within the next 5 minutes to be safe."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 75,
+            powerLevel: 35,
+            stressLevel: 45
+        },
+        choices: [
+            {
+                text: "You have 5 minutes. Move quickly but carefully.",
+                type: "urgent",
+                next: "find_route"
+            },
+            {
+                text: "Can you optimize your oxygen consumption?",
+                type: "technical",
+                next: "oxygen_optimization"
+            },
+            {
+                text: "Stay focused. We'll get you out in time.",
+                type: "supportive",
+                next: "find_route"
+            }
+        ]
+    },
+
+    oxygen_optimization: {
+        id: 'oxygen_optimization',
+        messages: [
+            "I can try to reduce my oxygen consumption. Slow, deep breaths.",
+            "I'm also shutting down non-essential systems to reduce power drain.",
+            "The oxygen levels are stabilizing... I might have gained a few more minutes.",
+            "But I still need to move quickly. The ship is still failing."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 80,
+            powerLevel: 30,
+            stressLevel: 40
+        },
+        choices: [
+            {
+                text: "Good work. Now get moving to the escape pods.",
+                type: "supportive",
+                next: "find_route"
+            },
+            {
+                text: "Can you access the emergency oxygen supply?",
+                type: "technical",
+                next: "emergency_oxygen"
+            },
+            {
+                text: "Every minute counts. Move now!",
+                type: "urgent",
+                next: "find_route"
+            }
+        ]
+    },
+
+    // Additional missing nodes
+    escape_priority: {
+        id: 'escape_priority',
+        messages: [
+            "You're right. I need to focus on getting to the escape pods.",
+            "The main corridor is blocked, but I can see the maintenance shaft.",
+            "I'm heading there now. The ship is shaking more violently.",
+            "I can hear metal groaning. This ship isn't going to hold together much longer."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 75,
+            powerLevel: 35,
+            stressLevel: 50
+        },
+        choices: [
+            {
+                text: "Take the maintenance shaft. It's safer.",
                 type: "safe",
-                next: "choose_pod_2"
+                next: "maintenance_shaft"
             },
             {
-                text: "Try to power up Pod 3 first. Could be just a minor issue.",
-                type: "technical",
-                next: "attempt_pod_3_repair"
+                text: "Push through the debris. Time is critical.",
+                type: "urgent",
+                next: "debris_shortcut"
             },
             {
-                text: "See if you can quickly fix Pod 1's launch system.",
+                text: "Check for alternate routes first.",
                 type: "technical",
-                next: "quick_pod_1_fix"
+                next: "find_route"
             }
         ]
     },
 
-    choose_pod_2: {
-        id: 'choose_pod_2',
+    calm_approach: {
+        id: 'calm_approach',
         messages: [
-            "Getting into Pod 2 now... systems are powering up.",
-            "Life support is active, navigation is online. The engines are responding to pre-flight checks.",
-            "Unlocking the bay door... there! I can see space through the opening.",
-            "Ready to launch on your word. Once I leave, we'll lose contact until I reach a communication relay."
+            "Thank you. I'm trying to stay calm.",
+            "Let me think this through systematically.",
+            "I need to assess my options: escape pods, life support, and time remaining.",
+            "The escape pods are my priority, but I need to get there safely."
         ],
+        telemetry_effect: {
+            oxygenLevel: 78,
+            powerLevel: 42,
+            stressLevel: 30
+        },
         choices: [
             {
-                text: "Launch now! Get to safety!",
-                type: "urgent",
-                next: "successful_escape"
-            },
-            {
-                text: "Wait - try to send a distress signal first.",
+                text: "Check the ship's systems first. Know what you're working with.",
                 type: "technical",
-                next: "distress_signal_attempt"
+                next: "diagnostic_check"
             },
             {
-                text: "Double-check all systems one more time.",
+                text: "Focus on the escape route. What's the safest path?",
                 type: "safe",
-                next: "final_systems_check"
+                next: "find_route"
+            },
+            {
+                text: "You're doing great. Let's get you to safety.",
+                type: "supportive",
+                next: "find_route"
             }
         ]
     },
 
-    successful_escape: {
-        id: 'successful_escape',
-        character: {
-            status: 'online'
+    schematic_check: {
+        id: 'schematic_check',
+        messages: [
+            "I'm accessing the ship's schematics...",
+            "There's a service corridor on the port side that might be accessible.",
+            "It's longer but should be safer than the main corridor.",
+            "The schematics show it connects directly to the escape pod bay."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 82,
+            powerLevel: 36,
+            stressLevel: 42
         },
-        messages: [
-            "Launching now! The pod is clear of the ship!",
-            "I can see the Meridian behind me... it's completely dark now. The hull breach is massive.",
-            "Navigation shows the nearest station is 6 hours away. I have enough supplies thanks to your guidance.",
-            "The rescue beacon is active. I'm going to make it... because of you."
-        ],
-        gameOver: {
-            title: "Mission Successful!",
-            message: "Alex successfully escaped in Pod 2 and reached safety. Your careful guidance saved a life."
-        }
-    },
-
-    distress_signal_attempt: {
-        id: 'distress_signal_attempt',
-        messages: [
-            "Sending distress signal... come on, work...",
-            "Got it! Signal transmitted with the Meridian's last known coordinates and crew status.",
-            "This will help the investigation and might save other ships from the same fate.",
-            "Now launching... pod is clear! Thank you for thinking of the bigger picture."
-        ],
-        gameOver: {
-            title: "Hero's Escape!",
-            message: "Alex escaped safely AND sent crucial data that prevented future disasters. Your foresight saved many lives."
-        }
-    },
-
-    attempt_pod_3_repair: {
-        id: 'attempt_pod_3_repair',
-        messages: [
-            "Let me check Pod 3's power coupling... just need to bypass this relay...",
-            "Yes! The systems are coming online! This pod actually has newer navigation equipment.",
-            "Wait... there's something wrong with the atmospheric seals. This pod might have been damaged in the impact.",
-            "I could try to fix it, but that would take time I might not have."
-        ],
         choices: [
             {
-                text: "Forget Pod 3. Go back to Pod 2 immediately.",
+                text: "Take the service corridor. Safety over speed.",
                 type: "safe",
-                next: "return_to_pod_2"
+                next: "service_corridor"
             },
             {
-                text: "Try a quick seal repair with the emergency kit.",
+                text: "Good find. Let's get moving.",
+                type: "supportive",
+                next: "service_corridor"
+            },
+            {
+                text: "The corridor might be blocked too. Try the maintenance shaft.",
                 type: "technical",
-                next: "emergency_seal_repair"
-            },
-            {
-                text: "Risk it. Launch with the compromised seals.",
-                type: "urgent",
-                next: "risky_launch"
+                next: "maintenance_shaft"
             }
         ]
     },
 
-    emergency_seal_repair: {
-        id: 'emergency_seal_repair',
-        character: {
-            status: 'weak'
-        },
+    service_corridor: {
+        id: 'service_corridor',
         messages: [
-            "Using the emergency sealant from the supply kit...",
-            "The patch is holding, but I can hear the ship's hull failing behind me.",
-            "Pod 3 systems show green across the board now. This might actually be the better choice.",
-            "But the sealant is a temporary fix. I need to launch soon or find a permanent solution."
+            "I'm heading to the service corridor. It's a longer route but should be safer.",
+            "The corridor is clear so far. No debris or damage visible.",
+            "I can hear the ship's systems failing in the distance.",
+            "I'm almost to the escape pod bay. The corridor is holding up well."
         ],
+        telemetry_effect: {
+            oxygenLevel: 80,
+            powerLevel: 32,
+            stressLevel: 45
+        },
         choices: [
             {
-                text: "Launch immediately with the temporary fix.",
-                type: "urgent",
-                next: "temporary_seal_escape"
+                text: "Good progress. Keep moving.",
+                type: "supportive",
+                next: "reach_pods"
             },
             {
-                text: "Try to find permanent sealing materials in the pod.",
+                text: "Check the pod bay status before entering.",
                 type: "technical",
-                next: "search_for_materials"
+                next: "pod_check"
+            },
+            {
+                text: "Hurry! The ship is still failing.",
+                type: "urgent",
+                next: "reach_pods"
             }
         ]
     },
 
-    temporary_seal_escape: {
-        id: 'temporary_seal_escape',
+    pod_check: {
+        id: 'pod_check',
         messages: [
-            "Launching with Pod 3... the bay door is opening...",
-            "I'm clear of the ship! The seal is holding so far.",
-            "Wait... I'm detecting a slow pressure leak. The temporary fix is failing.",
-            "I have maybe 2 hours before it becomes critical. The nearest station is 6 hours away..."
+            "I'm checking the pod bay systems from the corridor.",
+            "Pod 1 shows green status. Pod 2 has a warning light. Pod 3 is offline.",
+            "The bay door mechanism appears functional.",
+            "I should be able to access the pods safely."
         ],
-        gameOver: {
-            title: "Risky Gamble",
-            message: "Alex launched with compromised seals. The outcome depends on whether rescue arrives in time... Your technical skills gave them a fighting chance."
-        }
-    },
-
-    return_to_pod_2: {
-        id: 'return_to_pod_2',
-        messages: [
-            "You're right. Back to Pod 2 - the safe choice.",
-            "But when I turn around... Pod 2's hatch is showing a malfunction warning now!",
-            "Something must have happened while I was working on Pod 3. Maybe a power surge?",
-            "I might be able to override it, but this is getting dangerous."
-        ],
+        telemetry_effect: {
+            oxygenLevel: 78,
+            powerLevel: 30,
+            stressLevel: 48
+        },
         choices: [
             {
-                text: "Try the manual hatch override on Pod 2.",
-                type: "technical",
-                next: "manual_override_attempt"
+                text: "Board Pod 1. It's the most reliable.",
+                type: "safe",
+                next: "reach_pods"
             },
             {
-                text: "Go back to Pod 3 and launch despite the seal issue.",
+                text: "Check what's wrong with Pod 2 first.",
+                type: "technical",
+                next: "pod_systems_check"
+            },
+            {
+                text: "Get to the pods now. Time is critical.",
                 type: "urgent",
-                next: "forced_pod_3_choice"
+                next: "reach_pods"
             }
         ]
     },
 
-    manual_override_attempt: {
-        id: 'manual_override_attempt',
+    pod_systems_check: {
+        id: 'pod_systems_check',
         messages: [
-            "Working on the manual override... need to access the emergency panel...",
-            "Got it! The hatch is opening, but the system is throwing more error codes.",
-            "The launch sequence might be compromised. I could try an emergency launch, but it's risky.",
-            "Or I could try to diagnose the problem, but the ship is really falling apart now."
+            "I'm checking Pod 2's systems...",
+            "The warning light is for the navigation system. It's a minor issue.",
+            "The life support and engines are all green.",
+            "I can probably fix the navigation issue quickly, or launch with the warning."
         ],
+        telemetry_effect: {
+            oxygenLevel: 75,
+            powerLevel: 28,
+            stressLevel: 50
+        },
         choices: [
             {
-                text: "Emergency launch! Don't wait for diagnostics!",
-                type: "urgent",
-                next: "emergency_launch_pod_2"
+                text: "Fix the navigation issue. Better safe than sorry.",
+                type: "technical",
+                next: "fix_navigation"
             },
             {
-                text: "Take 30 seconds to run a quick diagnostic.",
-                type: "technical",
-                next: "quick_diagnostic"
+                text: "Launch with the warning. Time is more important.",
+                type: "urgent",
+                next: "launch_escape"
+            },
+            {
+                text: "Go with Pod 1 instead. It's safer.",
+                type: "safe",
+                next: "reach_pods"
             }
         ]
     },
 
-    emergency_launch_pod_2: {
-        id: 'emergency_launch_pod_2',
-        character: {
-            status: 'offline'
-        },
+    fix_navigation: {
+        id: 'fix_navigation',
         messages: [
-            "Emergency launch initiated! Pod 2 is launching...",
-            "I'm clear! But... something's wrong with the communication system...",
-            "The override damaged something. I'm losing contact with you...",
-            "Thank you for everything... I hope this signal reaches..."
+            "I'm working on the navigation system...",
+            "It's just a sensor calibration issue. I can fix this.",
+            "The system is responding... navigation is now green.",
+            "Pod 2 is fully operational now. I'm boarding."
         ],
-        gameOver: {
-            title: "Emergency Escape",
-            message: "Alex launched in an emergency escape but lost communications. Their fate remains unknown, but your quick thinking gave them the best possible chance."
-        }
+        telemetry_effect: {
+            oxygenLevel: 72,
+            powerLevel: 25,
+            stressLevel: 52
+        },
+        choices: [
+            {
+                text: "Excellent work. Launch when ready.",
+                type: "supportive",
+                next: "launch_escape"
+            },
+            {
+                text: "Good thinking. Now get out of here!",
+                type: "urgent",
+                next: "launch_escape"
+            },
+            {
+                text: "Double-check all systems before launch.",
+                type: "safe",
+                next: "launch_escape"
+            }
+        ]
     },
 
-    quick_diagnostic: {
-        id: 'quick_diagnostic',
-        character: {
-            status: 'offline'
+    emergency_oxygen: {
+        id: 'emergency_oxygen',
+        messages: [
+            "I'm checking for emergency oxygen supplies...",
+            "There's an emergency tank in the pod bay. I can access it.",
+            "The tank is full and functional. This will give me extra time.",
+            "I'm connecting it to my suit. Oxygen levels are now stable."
+        ],
+        telemetry_effect: {
+            oxygenLevel: 95,
+            powerLevel: 25,
+            stressLevel: 45
         },
-        messages: [
-            "Running diagnostic... navigation is fine, life support is... OH NO!",
-            "A structural support beam just collapsed behind me! The whole section is coming apart!",
-            "I have to launch NOW or I won't make it at all!",
-            "Launching! I'm... [SIGNAL LOST]"
-        ],
-        gameOver: {
-            title: "Too Late",
-            message: "The ship's destruction caught up with Alex before they could escape safely. Sometimes hesitation costs everything. Their sacrifice won't be forgotten."
-        }
-    },
-
-    // Additional story branches and endings would continue here...
-    // This represents about 1/3 of a full Lifeline-style game
-
-    final_systems_check: {
-        id: 'final_systems_check',
-        messages: [
-            "Good idea. Let me double-check everything...",
-            "Life support: optimal. Navigation: locked onto nearest station. Engines: ready.",
-            "Communications: I'll lose contact in 3... 2... 1...",
-            "Launching! See you on the other side!"
-        ],
-        gameOver: {
-            title: "Perfect Escape!",
-            message: "Alex escaped safely with all systems verified. Your methodical approach ensured the best possible outcome. Sometimes slow and steady really does win the race."
-        }
+        choices: [
+            {
+                text: "Perfect. Now get to the escape pods.",
+                type: "supportive",
+                next: "find_route"
+            },
+            {
+                text: "Good thinking. You have more time now.",
+                type: "safe",
+                next: "find_route"
+            },
+            {
+                text: "Don't waste time. Move quickly!",
+                type: "urgent",
+                next: "find_route"
+            }
+        ]
     }
 };
 

@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#000000"/>
+  <g fill="#ffffff">
+    <!-- Space ship -->
+    <path d="M256 100 L200 200 L150 250 L200 300 L256 400 L312 300 L362 250 L312 200 Z"/>
+    <!-- Stars -->
+    <circle cx="100" cy="100" r="2"/>
+    <circle cx="400" cy="150" r="1.5"/>
+    <circle cx="80" cy="350" r="1"/>
+    <circle cx="420" cy="320" r="1.5"/>
+    <circle cx="150" cy="80" r="1"/>
+    <circle cx="350" cy="380" r="1"/>
+    <!-- Communication waves -->
+    <path d="M256 180 Q300 180 320 200" stroke="#ffffff" stroke-width="2" fill="none"/>
+    <path d="M256 200 Q300 200 320 220" stroke="#ffffff" stroke-width="2" fill="none"/>
+    <path d="M256 220 Q300 220 320 240" stroke="#ffffff" stroke-width="2" fill="none"/>
+  </g>
+</svg>

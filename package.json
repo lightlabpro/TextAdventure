@@ -1,0 +1,16 @@
+{
+  "name": "space-rescue",
+  "version": "1.0.0",
+  "description": "A Lifeline-style text adventure game about space rescue missions",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000"
+  },
+  "keywords": ["game", "text-adventure", "space", "web"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

@@ -152,26 +152,51 @@ async function startCinematicIntro() {
     
     let currentIndex = 0;
     let skipIntro = false;
+    let gameStarted = false; // Add flag to prevent multiple game starts
+    let autoAdvanceTimer = null; // Track the auto-advance timer
+    let isManualProgress = false; // Flag to prevent auto-advance interference
     
     // Skip intro button handler
     skipBtn.addEventListener('click', () => {
         skipIntro = true;
-        startGameAfterIntro();
+        isManualProgress = true;
+        if (autoAdvanceTimer) {
+            clearTimeout(autoAdvanceTimer);
+            autoAdvanceTimer = null;
+        }
+        if (!gameStarted) {
+            gameStarted = true;
+            startGameAfterIntro();
+        }
     });
     
     // Next button handler
     nextBtn.addEventListener('click', () => {
+        // Clear any pending auto-advance timer
+        if (autoAdvanceTimer) {
+            clearTimeout(autoAdvanceTimer);
+            autoAdvanceTimer = null;
+        }
+        
+        isManualProgress = true;
         currentIndex++;
         if (currentIndex < introSequence.length) {
+            nextBtn.style.display = 'none';
             displayNextLine();
         } else {
-            startGameAfterIntro();
+            if (!gameStarted) {
+                gameStarted = true;
+                startGameAfterIntro();
+            }
         }
     });
     
     // Function to display next line with typing animation
     async function displayNextLine() {
         if (skipIntro) return;
+        
+        // Reset manual progress flag for this line
+        isManualProgress = false;
         
         const item = introSequence[currentIndex];
         
@@ -183,6 +208,9 @@ async function startCinematicIntro() {
         textElement.className = `intro-text ${item.type === 'title' ? 'intro-title' : ''}`;
         introContent.appendChild(textElement);
         
+        // Show next button immediately when typing starts
+        nextBtn.style.display = 'inline-block';
+        
         // Type out the text character by character
         const text = item.text;
         let currentText = '';
@@ -191,43 +219,40 @@ async function startCinematicIntro() {
             if (skipIntro) return;
             
             currentText += text[i];
-            textElement.textContent = currentText + '█'; // Add cursor
+            textElement.textContent = currentText + '▋'; // Use square cursor character
             
-            // Organic timing: faster for short text, slower for long text
-            const baseDelay = 50; // Base delay per character
+            // Slower typing: increased base delay
+            const baseDelay = 100; // Increased from 50 to 100ms per character
             const lengthMultiplier = Math.max(0.5, Math.min(2, text.length / 30)); // Adjust based on text length
             const delay = baseDelay * lengthMultiplier;
             
             await new Promise(resolve => setTimeout(resolve, delay));
         }
         
-        // Remove cursor and add blinking cursor
+        // Remove cursor and add blinking cursor using the same character
         textElement.textContent = currentText;
-        const cursor = document.createElement('span');
-        cursor.className = 'typing-cursor';
-        textElement.appendChild(cursor);
+        const cursorSpan = document.createElement('span');
+        cursorSpan.textContent = '▋';
+        cursorSpan.style.animation = 'blink 1s infinite';
+        textElement.appendChild(cursorSpan);
         
         // Calculate organic display time based on text length
         const baseTime = 2000; // Base time in ms
         const lengthMultiplier = Math.max(0.8, Math.min(3, text.length / 20)); // Adjust based on text length
         const displayTime = baseTime * lengthMultiplier;
         
-        // Show next button after a short delay
-        setTimeout(() => {
-            if (!skipIntro) {
-                nextBtn.style.display = 'inline-block';
-            }
-        }, 1000);
-        
         // Auto-advance after organic time (unless skipped)
-        setTimeout(() => {
-            if (!skipIntro) {
+        autoAdvanceTimer = setTimeout(() => {
+            if (!skipIntro && !isManualProgress) {
                 currentIndex++;
                 if (currentIndex < introSequence.length) {
                     nextBtn.style.display = 'none';
                     displayNextLine();
                 } else {
-                    startGameAfterIntro();
+                    if (!gameStarted) {
+                        gameStarted = true;
+                        startGameAfterIntro();
+                    }
                 }
             }
         }, displayTime);
